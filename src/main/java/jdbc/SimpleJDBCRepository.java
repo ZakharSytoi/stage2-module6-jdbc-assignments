@@ -35,16 +35,16 @@ public class SimpleJDBCRepository {
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0){
+            if (affectedRows > 0) {
                 ResultSet resultSet = ps.getGeneratedKeys();
                 if (resultSet.next()) {
                     return resultSet.getLong(1);
                 }
-            }
-            else return null;
+            } else return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 
     public User findUserById(Long userId) {
@@ -72,7 +72,7 @@ public class SimpleJDBCRepository {
             ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
             ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 User user = new User(rs.getLong("id"),
                         rs.getString("firstname"),
                         rs.getString("lastname"),
@@ -83,6 +83,7 @@ public class SimpleJDBCRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 
     public List<User> findAllUser() {
