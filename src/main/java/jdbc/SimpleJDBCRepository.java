@@ -24,7 +24,7 @@ public class SimpleJDBCRepository {
     private static final String UPDATE_USER_SQL = "UPDATE myusers SET firstname = ?, lastname = ?, age = ? WHERE id = ?;";
     private static final String DELETE_USER = "DELETE FROM myusers WHERE id = ?;";
     private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM myusers WHERE id = ?;";
-    private static final String FIND_USER_BY_NAME_SQL = "SELECT FROM myusers WHERE firstname = ?;";
+    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM myusers WHERE firstname = ?;";
     private static final String FIND_ALL_USER_SQL = "SELECT * FROM myusers";
 
     public Long createUser(User user) {
@@ -112,7 +112,7 @@ public class SimpleJDBCRepository {
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
-            ps.setLong(3, user.getId());
+            ps.setLong(4, user.getId());
             ps.executeUpdate();
             return findUserById(user.getId());
         } catch (SQLException e) {
