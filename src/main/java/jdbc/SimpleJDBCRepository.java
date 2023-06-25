@@ -35,8 +35,12 @@ public class SimpleJDBCRepository {
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0)
-                return ps.getGeneratedKeys().getLong(1);
+            if (affectedRows > 0){
+                ResultSet resultSet = ps.getGeneratedKeys();
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                }
+            }
             else return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -49,10 +53,13 @@ public class SimpleJDBCRepository {
             ps = connection.prepareStatement(FIND_USER_BY_ID_SQL);
             ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
-            User user = new User(rs.getLong("id"),
-                    rs.getString("firstname"),
-                    rs.getString("lastname"),
-                    rs.getInt("age"));
+            User user = null;
+            while (rs.next()) {
+                user = new User(rs.getLong("id"),
+                        rs.getString("firstname"),
+                        rs.getString("lastname"),
+                        rs.getInt("age"));
+            }
             return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -65,11 +72,14 @@ public class SimpleJDBCRepository {
             ps = connection.prepareStatement(FIND_USER_BY_NAME_SQL);
             ps.setString(1, userName);
             ResultSet rs = ps.executeQuery();
-            User user = new User(rs.getLong("id"),
-                    rs.getString("firstname"),
-                    rs.getString("lastname"),
-                    rs.getInt("age"));
-            return user;
+            if(rs.next()){
+                User user = new User(rs.getLong("id"),
+                        rs.getString("firstname"),
+                        rs.getString("lastname"),
+                        rs.getInt("age"));
+                return user;
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
