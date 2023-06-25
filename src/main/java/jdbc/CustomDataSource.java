@@ -1,11 +1,11 @@
 package jdbc;
 
+import javax.sql.DataSource;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -20,86 +20,74 @@ public class CustomDataSource implements DataSource {
     private final String url;
     private final String name;
     private final String password;
-    private static final Object lock = new Object();
 
-    private CustomDataSource(String driver, String url, String password, String name) {
+    private CustomDataSource(String driver, String url, String name, String password) {
         this.driver = driver;
         this.url = url;
-        this.password = password;
         this.name = name;
-        instance = this;
+        this.password = password;
     }
 
     public static CustomDataSource getInstance() {
         if (instance == null) {
-            synchronized (lock) {
-                if (instance == null) {
-                    try {
-                        Properties properties = new Properties();
-                        properties.load(
-                                CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties")
-                        );
-                        instance = new CustomDataSource(
-                                properties.getProperty("postgres.driver"),
-                                properties.getProperty("postgres.url"),
-                                properties.getProperty("postgres.name"),
-                                properties.getProperty("postgres.password")
-
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+            try (InputStream input = new FileInputStream("src/main/resources/app.properties")) {
+                Properties prop = new Properties();
+                // load a properties file
+                prop.load(input);
+                instance = new CustomDataSource(
+                        prop.getProperty("postgres.driver"),
+                        prop.getProperty("postgres.url"),
+                        prop.getProperty("postgres.name"),
+                        prop.getProperty("postgres.password"));
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
         return instance;
     }
 
-
     @Override
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
         return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
-    public Connection getConnection(String s, String s1) {
+    public Connection getConnection(String username, String password) throws SQLException {
         return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
+        return null;
+    }
+
+    @Override
+    public void setLogWriter(PrintWriter out) throws SQLException {
         throw new SQLException();
     }
 
     @Override
-    public void setLogWriter(PrintWriter printWriter) throws SQLException {
+    public void setLoginTimeout(int seconds) throws SQLException {
         throw new SQLException();
-
-    }
-
-    @Override
-    public void setLoginTimeout(int i) throws SQLException {
-        throw new SQLException();
-
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        throw new SQLException();
+        return 0;
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException();
+        return null;
     }
 
     @Override
-    public <T> T unwrap(Class<T> aClass) throws SQLException {
-        throw new SQLException();
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return null;
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-        throw new SQLException();
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return false;
     }
 }
