@@ -119,7 +119,7 @@ public class SimpleJDBCRepository {
             connection = CustomDataSource.getInstance().getConnection();
             ps = connection.prepareStatement(deleteUser);
             ps.setLong(1, userId);
-            ps.executeQuery();
+            ps.executeUpdate();
             connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
