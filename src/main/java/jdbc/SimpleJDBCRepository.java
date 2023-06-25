@@ -35,7 +35,6 @@ public class SimpleJDBCRepository {
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             int affectedRows = ps.executeUpdate();
-            connection.close();
             if (affectedRows > 0)
                 return ps.getGeneratedKeys().getLong(1);
             else return null;
@@ -54,7 +53,6 @@ public class SimpleJDBCRepository {
                     rs.getString("firstname"),
                     rs.getString("lastname"),
                     rs.getInt("age"));
-            connection.close();
             return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -71,7 +69,6 @@ public class SimpleJDBCRepository {
                     rs.getString("firstname"),
                     rs.getString("lastname"),
                     rs.getInt("age"));
-            connection.close();
             return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -84,7 +81,6 @@ public class SimpleJDBCRepository {
             ps = connection.prepareStatement(FIND_ALL_USER_SQL);
             List<User> list = new ArrayList<>();
             ResultSet rs = ps.executeQuery();
-            connection.close();
             while (rs.next()) {
                 User user = new User(rs.getLong("id"),
                         rs.getString("firstname"),
@@ -107,7 +103,6 @@ public class SimpleJDBCRepository {
             ps.setInt(3, user.getAge());
             ps.setLong(3, user.getId());
             ps.executeUpdate();
-            connection.close();
             return findUserById(user.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -120,7 +115,6 @@ public class SimpleJDBCRepository {
             ps = connection.prepareStatement(DELETE_USER);
             ps.setLong(1, userId);
             ps.executeUpdate();
-            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
